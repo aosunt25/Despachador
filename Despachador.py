@@ -22,9 +22,13 @@ class Despachador():
     pass
     microprocesadores = []
     listaDeProcesos = []
+    tamanioDeProceso = []
+    tiempoDeEntrada = []
+    cantidadDeBloqueo = []
     numDeMicro = None
     entryMicro = None
     entryQuantums = None
+
 
     
 
@@ -72,49 +76,107 @@ class Despachador():
            linea=archivo.readlines()
            for x in linea:
                 lineaActual = x.split(',')
-                print(lineaActual[0], " ", lineaActual[1], " ", lineaActual[2])
-                proceso = Procesos(lineaActual[0],lineaActual[1],lineaActual[2],0,0,0,0,0)
-                self.listaDeProcesos.append(proceso)
+                print(lineaActual[0], " ", lineaActual[1], " ", lineaActual[2], " ", lineaActual[3])
+                self.listaDeProcesos.append(lineaActual[0])
+                self.tamanioDeProceso.append(lineaActual[1])
+                self.tiempoDeEntrada.append(lineaActual[2])
+                self.cantidadDeBloqueo.append(lineaActual[3])
             
         for i in range(len(self.listaDeProcesos)):
             print(self.listaDeProcesos[i])
 
     def prueba(self):
+        self.lecturaDeArchivo()
         self.numDeMicro = self.entryMicro.get()
         print(self.numDeMicro)
         print("hola l")
-
+       
     def interfaz (self):
         root = tk.Tk()
         root.config(width=300, height=200)
         
-        #grid = Grid()
-        labelQuantums = tk.Label(root, text = "Quantums").grid(row = 0)
-        self.entryQuantums = tk.Entry(root).grid(row = 0, column = 1)
-        labelMicro = tk.Label(root, text = "Numero de micros").grid(row = 1)
-        self.entryMicro = tk.Entry(root)
-        self.entryMicro.grid(row = 1 , column = 1)
-        frame_canvas = tk.Frame(root)
-        frame_canvas.grid(row=7 , column=0, pady=(5, 0), sticky='nw')
+        
+        #Espacio para dividir las cosas en el root
+        labelEspacio = tk.Label(root).grid(row = 2, sticky='nw' ,column = 0)
+        labelEspacio = tk.Label(root, text = "Despachador", font = ("bold", 32)).grid(row = 0, sticky='n' ,column = 0)
+
+        #Se crea el frame donde se encuentra Quantums y Num de Micros
+        frame_DatosIngreso = tk.Frame(root, bg = "white")
+        frame_DatosIngreso.grid(row = 1, column = 0, sticky = 'nw')
+        frame_DatosIngreso.grid_rowconfigure(0, weight = 1)
+        frame_DatosIngreso.grid_columnconfigure(0, weight = 1)
+
+        #Se crea el Canvas de Quantums y Num de Micros
+        canvasDatos = tk.Canvas(frame_DatosIngreso, bg = "white")
+        canvasDatos.grid(row=0, column=0, sticky = "nw")
+
+        #Se crea el siguiente frame donde se guardan las Lables
+        frameDatos = tk.Frame(frame_DatosIngreso)
+
+        canvasDatos.create_window((0, 0), window=frameDatos, anchor='nw')
+
+        #Se crea las Labels y Caja de taxto de Quantums 
+        labelQuantums = tk.Label(canvasDatos, text = "Quantums").grid(row = 0, sticky='nw', column = 0)
+        self.entryQuantums = tk.Entry(canvasDatos).grid(row = 0, column = 1, sticky='nw')
+
+         #Se crea las Labels y Caja de taxto de Numero de Micros
+        labelMicro = tk.Label(canvasDatos, text = "Numero de micros").grid(row = 1, sticky='nw' ,column = 0)
+        self.entryMicro = tk.Entry(canvasDatos)
+        self.entryMicro.grid(row = 1 , column = 1, sticky='nw')
+        
+        #Se creo el boton de Mostrar tabla
+        #Llama a funcion de aniadirMicro
+        button = ttk.Button(canvasDatos,text ="Mostrar Tabla", command = self.prueba)
+        button.grid(row = 3, column = 0, sticky = "nw")
+
+        #Se crea el primer Frame de la lista de procesos
+        
+        frame_canvas = tk.Frame(root, bg = "red")
+        frame_canvas.grid(row=3 , column=0,  sticky='nw')
         frame_canvas.grid_rowconfigure(0, weight=1)
         frame_canvas.grid_columnconfigure(0, weight=1)
+        
+        #Se creo el Canvas de la Lista de procesos 
         canvas = tk.Canvas(frame_canvas, bg="gray")
-        canvas.grid(row=0, column=0, sticky="news")
+        canvas.grid(row=1, column=0, sticky="news")
+        
+        #Se crea el Frame que tendra guardado los datos de los Procesos
+        frameProcesos = tk.Frame(frame_canvas, bg="gray", width = frame_canvas.winfo_width())
+        frameProcesos.grid_columnconfigure(0,weight = 1, pad = 20)
+        frameProcesos.grid_columnconfigure(1,weight = 1, pad = 100)
+        frameProcesos.grid_columnconfigure(2,weight = 1, pad = 100)
+        frameProcesos.grid_columnconfigure(3,weight = 1, pad = 100)
+        canvas.create_window((0, 0), window=frameProcesos, anchor='ne')
+
+        #Se creo una ScrollBar para poder mostrar todos los proceso en un espacio compacto
+        vsb = tk.Scrollbar(frame_canvas, orient="vertical", command=canvas.yview)
+        vsb.grid(row=1, column=1, sticky='ns')
+        canvas.configure(yscrollcommand=vsb.set)
+
         rows = len(self.listaDeProcesos)
         columns = 3
-        #procesos = [[tk.Lable() for j in range(columns)] for i in range(rows)]
-        '''
-        for i in range(0, rows):
-            procesoNom = tk.Label (text = self.listaDeProcesos[i].name)
-            procesoNom.grid(row = i, columns=0)
-            proceso = tk.Label (text = self.listaDeProcesos[i].tt)
-            procesoNom.grid(row = i, columns=1)
-        '''
 
-            
+        #Se crea el Lable que muestra el menu de la tabla
+        menuDeTabla = tk.Label(frame_canvas, text = "Nombre  Tiempo de Proceso  Tiempo de Entrada  Cantidad de Bloque", bg = "red")
+        menuDeTabla.grid(row = 0, column = 0)
         
-        button = ttk.Button(root,text ="Mostrar Tabla", command = self.prueba)
-        button.grid(row = 6)
+        #Agrega cada proceso al Frame por Nombre, Tamaño, Tiempo de Entrada y Bloqueo
+        for i in range(0, rows):
+            procesoNom = tk.Label (frameProcesos, text = self.listaDeProcesos[i], bg = "gray",fg = "white")
+            procesoNom.grid(row = i, column=0)
+            procesoTamanio = tk.Label (frameProcesos, text = self.tamanioDeProceso[i],bg = "gray", fg = "white")
+            procesoTamanio.grid(row = i, column=1)
+            procesoTiempo = tk.Label (frameProcesos, text = self.tiempoDeEntrada[i],bg = "gray",fg = "white")
+            procesoTiempo.grid(row = i, column=2)
+            procesoBloq = tk.Label (frameProcesos, text = self.cantidadDeBloqueo[i],bg = "gray",fg = "white")
+            procesoBloq.grid(row = i, column=3)
+        
+
+        frameProcesos.update_idletasks() 
+        canvas.config(scrollregion=canvas.bbox("all"))
+
+
+        
         button.pack
         root.mainloop()
 
