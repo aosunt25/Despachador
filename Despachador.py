@@ -44,46 +44,37 @@ class Despachador():
 
         for i in range(num-1):
             tvc = ((math.ceil(tiemposEjecucion[i] / float(duracionQuantum))) - 1) * duracionCambio
-
             tb = numBloqueos[i]*duracionBloqueo
+            
+            for i in range(len(self.microprocesadores)):
+                if len(self.microprocesadores[i].procesos) == 0 :
+                    tt = tiemposEjecucion[i] + tvc + numBloqueos[i]*duracionBloqueo  
+                    proceso = Procesos(names[i], 0, tvc, tiemposEjecucion[i], tb, 0, tt, tt)
+                    self.microprocesadores[i].procesos.append(proceso)
+                else:
+                    #AQUI SE DEBE CHECAR QUE MICRO TIENE MENOS TIEMPO FINAL EN SU ULTIMA POSICION DE PROCESOS .TF
+                    '''        
+                    if len(self.microprocesadores)>1:
+                        for i in range(len(self.microprocesadores)):
+                            #print("HOLI")
+                            lene = len(self.microprocesadores[i].procesos)
+                            if self.tiempoMenor > self.microprocesadores[i].procesos[lene-1].tf:
+                                self.tiempoMenor = self.microprocesadores[i].procesos[lene-1].tf
+                            for j in range(len(self.microprocesadores)):
+                                print("HOLI")
+                                lene = len(self.microprocesadores[j].procesos)
+                                print(lene)
+                                if self.tiempoMenor > self.microprocesadores[j].procesos[lene].tf:
+                                    self.tiempoMenor = self.microprocesadores[j].procesos[lene].tf
+                        print("TIEMPO MENOR")
+                        print(self.tiempoMenor)
 
-            if i == 0:
-                tt = tiemposEjecucion[i] + tvc + numBloqueos[i]*duracionBloqueo  
-                proceso = Procesos(names[i], 0, tvc, tiemposEjecucion[i], tb, 0, tt, tt)
+                    tt = duracionCambio + tiemposEjecucion[i] + tvc + numBloqueos[i]*duracionBloqueo
+                    ti = self.microprocesadores[0].procesos[i-1].tf
+                    proceso = Procesos(names[i], duracionCambio, tvc, tiemposEjecucion[i], tb, ti, tt, ti + tt)
+                    self.microprocesadores[0].procesos.append(proceso)'''
 
-                self.microprocesadores[0].procesos.append(proceso)
-                self.tiempoMenor = self.microprocesadores[i].procesos[0].tf
-
-            else:
-                #AQUI SE DEBE CHECAR QUE MICRO TIENE MENOS TIEMPO FINAL EN SU ULTIMA POSICION DE PROCESOS .TF
-                for i in range(len(self.microprocesadores)):
-                    if len(self.microprocesadores[i].procesos) == 0 :
-                        tt = tiemposEjecucion[i] + tvc + numBloqueos[i]*duracionBloqueo  
-                        proceso = Procesos(names[i], 0, tvc, tiemposEjecucion[i], tb, 0, tt, tt)
-                        self.microprocesadores[i].procesos.append(proceso)
-                    else:
-                        '''        
-                        if len(self.microprocesadores)>1:
-                            for i in range(len(self.microprocesadores)):
-                                #print("HOLI")
-                                lene = len(self.microprocesadores[i].procesos)
-                                if self.tiempoMenor > self.microprocesadores[i].procesos[lene-1].tf:
-                                    self.tiempoMenor = self.microprocesadores[i].procesos[lene-1].tf
-                                for j in range(len(self.microprocesadores)):
-                                    print("HOLI")
-                                    lene = len(self.microprocesadores[j].procesos)
-                                    print(lene)
-                                    if self.tiempoMenor > self.microprocesadores[j].procesos[lene].tf:
-                                        self.tiempoMenor = self.microprocesadores[j].procesos[lene].tf
-                            print("TIEMPO MENOR")
-                            print(self.tiempoMenor)
-
-                        tt = duracionCambio + tiemposEjecucion[i] + tvc + numBloqueos[i]*duracionBloqueo
-                        ti = self.microprocesadores[0].procesos[i-1].tf
-                        proceso = Procesos(names[i], duracionCambio, tvc, tiemposEjecucion[i], tb, ti, tt, ti + tt)
-                        self.microprocesadores[0].procesos.append(proceso)'''
-
-        
+    
     
     def imprimirEstado(self):
         
@@ -212,6 +203,7 @@ def main():
     #Todo esto se va leer del txt
     numeroProcesos = 17
     numeroMicros = 16
+    #Ver como arreglo excepcion cuando se pasa de 16
     tiempoBloqueo = 10
     tiempoCambio = 10
     duracionQuantum = 100
