@@ -1,7 +1,7 @@
 import math
 from Procesos import Procesos
-import tkinter as tk
-from tkinter import ttk
+import Tkinter as tk
+import ttk
 
 class Microprocesador():
     
@@ -20,6 +20,7 @@ class Microprocesador():
 
 class Despachador():
     pass
+    tiempoMenor = 0
     microprocesadores = []
     listaDeProcesos = []
     tamanioDeProceso = []
@@ -51,15 +52,38 @@ class Despachador():
                 proceso = Procesos(names[i], 0, tvc, tiemposEjecucion[i], tb, 0, tt, tt)
 
                 self.microprocesadores[0].procesos.append(proceso)
+                self.tiempoMenor = self.microprocesadores[i].procesos[0].tf
 
             else:
                 #AQUI SE DEBE CHECAR QUE MICRO TIENE MENOS TIEMPO FINAL EN SU ULTIMA POSICION DE PROCESOS .TF
-                tt = duracionCambio + tiemposEjecucion[i] + tvc + numBloqueos[i]*duracionBloqueo
-                ti = self.microprocesadores[0].procesos[i-1].tf
-                proceso = Procesos(names[i], duracionCambio, tvc, tiemposEjecucion[i], tb, ti, tt, ti + tt)
-                self.microprocesadores[0].procesos.append(proceso)
+                for i in range(len(self.microprocesadores)):
+                    if len(self.microprocesadores[i].procesos) == 0 :
+                        tt = tiemposEjecucion[i] + tvc + numBloqueos[i]*duracionBloqueo  
+                        proceso = Procesos(names[i], 0, tvc, tiemposEjecucion[i], tb, 0, tt, tt)
+                        self.microprocesadores[i].procesos.append(proceso)
+                    else:
+                        '''        
+                        if len(self.microprocesadores)>1:
+                            for i in range(len(self.microprocesadores)):
+                                #print("HOLI")
+                                lene = len(self.microprocesadores[i].procesos)
+                                if self.tiempoMenor > self.microprocesadores[i].procesos[lene-1].tf:
+                                    self.tiempoMenor = self.microprocesadores[i].procesos[lene-1].tf
+                                for j in range(len(self.microprocesadores)):
+                                    print("HOLI")
+                                    lene = len(self.microprocesadores[j].procesos)
+                                    print(lene)
+                                    if self.tiempoMenor > self.microprocesadores[j].procesos[lene].tf:
+                                        self.tiempoMenor = self.microprocesadores[j].procesos[lene].tf
+                            print("TIEMPO MENOR")
+                            print(self.tiempoMenor)
 
-        #Aqui checar si hay mas de un micro
+                        tt = duracionCambio + tiemposEjecucion[i] + tvc + numBloqueos[i]*duracionBloqueo
+                        ti = self.microprocesadores[0].procesos[i-1].tf
+                        proceso = Procesos(names[i], duracionCambio, tvc, tiemposEjecucion[i], tb, ti, tt, ti + tt)
+                        self.microprocesadores[0].procesos.append(proceso)'''
+
+        
     
     def imprimirEstado(self):
         
@@ -160,7 +184,7 @@ class Despachador():
         menuDeTabla = tk.Label(frame_canvas, text = "Nombre  Tiempo de Proceso  Tiempo de Entrada  Cantidad de Bloque", bg = "red")
         menuDeTabla.grid(row = 0, column = 0)
         
-        #Agrega cada proceso al Frame por Nombre, Tamaño, Tiempo de Entrada y Bloqueo
+        #Agrega cada proceso al Frame por Nombre, Tamao, Tiempo de Entrada y Bloqueo
         for i in range(0, rows):
             procesoNom = tk.Label (frameProcesos, text = self.listaDeProcesos[i], bg = "gray",fg = "white")
             procesoNom.grid(row = i, column=0)
@@ -187,7 +211,7 @@ def main():
     despachador.lecturaDeArchivo()
     #Todo esto se va leer del txt
     numeroProcesos = 17
-    numeroMicros = 1
+    numeroMicros = 16
     tiempoBloqueo = 10
     tiempoCambio = 10
     duracionQuantum = 100
@@ -201,8 +225,9 @@ def main():
         despachador.aniadirMicroprocesador(i+1)
 
     despachador.aniadirProcesos(duracionQuantum, numeroProcesos, nombres, tiemposEjecucion, numBloqueos, tiempoBloqueo, tiempoCambio)
-    despachador.interfaz()
-    #despachador.imprimirEstado()
+    despachador.imprimirEstado()
+    #despachador.interfaz()
+    
 
 
 
