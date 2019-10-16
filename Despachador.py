@@ -1,7 +1,8 @@
 import math
 from Procesos import Procesos
-import Tkinter as tk
-import ttk
+import tkinter as tk
+from tkinter import ttk
+import tkinter.font as tkFont
 
 class Microprocesador():
     
@@ -28,6 +29,7 @@ class Despachador():
     cantidadDeBloqueo = []
     numDeMicro = None
     entryMicro = None
+    entryNumMicro = None
     entryQuantums = None
 
 
@@ -114,10 +116,18 @@ class Despachador():
         root = tk.Tk()
         root.config(width=300, height=200)
         
+        #Disenio de las letras
+        costumFontTitulo = tkFont.Font(family = "Bernard MT", size = 35, weight=tkFont.BOLD)
+        costumFontSubTit = tkFont.Font(family = "Times", size = 14)
         
         #Espacio para dividir las cosas en el root
         labelEspacio = tk.Label(root).grid(row = 2, sticky='nw' ,column = 0)
-        labelEspacio = tk.Label(root, text = "Despachador", font = ("bold", 32)).grid(row = 0, sticky='n' ,column = 0)
+        labelEspacioDos = tk.Label(root, width = 5, height = 5).grid(row = 3, sticky='nw' ,column = 5)
+        
+
+        #Titulo en la interfaz
+        labelTitulo = tk.Label(root, text = "Despachador", font = costumFontTitulo).grid(row = 0, sticky='nw' ,column = 0)
+       
 
         #Se crea el frame donde se encuentra Quantums y Num de Micros
         frame_DatosIngreso = tk.Frame(root, bg = "white")
@@ -135,11 +145,11 @@ class Despachador():
         canvasDatos.create_window((0, 0), window=frameDatos, anchor='nw')
 
         #Se crea las Labels y Caja de taxto de Quantums 
-        labelQuantums = tk.Label(canvasDatos, text = "Quantums").grid(row = 0, sticky='nw', column = 0)
+        labelQuantums = tk.Label(canvasDatos, text = "Quantums", font = costumFontSubTit).grid(row = 0, sticky='nw', column = 0)
         self.entryQuantums = tk.Entry(canvasDatos).grid(row = 0, column = 1, sticky='nw')
 
          #Se crea las Labels y Caja de taxto de Numero de Micros
-        labelMicro = tk.Label(canvasDatos, text = "Numero de micros").grid(row = 1, sticky='nw' ,column = 0)
+        labelMicro = tk.Label(canvasDatos, text = "Numero de micros" , font = costumFontSubTit).grid(row = 1, sticky='nw' ,column = 0)
         self.entryMicro = tk.Entry(canvasDatos)
         self.entryMicro.grid(row = 1 , column = 1, sticky='nw')
         
@@ -150,7 +160,7 @@ class Despachador():
 
         #Se crea el primer Frame de la lista de procesos
         
-        frame_canvas = tk.Frame(root, bg = "red")
+        frame_canvas = tk.Frame(root, bg = "red", highlightbackground="black" , highlightthickness = 2 )
         frame_canvas.grid(row=3 , column=0,  sticky='nw')
         frame_canvas.grid_rowconfigure(0, weight=1)
         frame_canvas.grid_columnconfigure(0, weight=1)
@@ -176,7 +186,7 @@ class Despachador():
         columns = 3
 
         #Se crea el Lable que muestra el menu de la tabla
-        menuDeTabla = tk.Label(frame_canvas, text = "Nombre  Tiempo de Proceso  Tiempo de Entrada  Cantidad de Bloque", bg = "red")
+        menuDeTabla = tk.Label(frame_canvas, text = "Proceso  Tiempo de Proceso  Tiempo de Entrada  Cantidad de Bloque", bg = "red")
         menuDeTabla.grid(row = 0, column = 0)
         
         #Agrega cada proceso al Frame por Nombre, Tamao, Tiempo de Entrada y Bloqueo
@@ -195,7 +205,78 @@ class Despachador():
         canvas.config(scrollregion=canvas.bbox("all"))
 
 
+        #Se crea el primer Frame de la lista de Micros
         
+        frame_canvasMicro = tk.Frame(root, bg = "red", highlightbackground="black" , highlightthickness = 2 )
+        frame_canvasMicro.grid(row=3 , column=7,  sticky='nw')
+        frame_canvasMicro.grid_rowconfigure(0, weight=1)
+        frame_canvasMicro.grid_columnconfigure(0, weight=1)
+        
+        #Se creo el Canvas de la Lista de Micros 
+        canvasMicro = tk.Canvas(frame_canvasMicro, bg="gray")
+        canvasMicro.grid(row=1, column=0, sticky="news")
+        
+        #Se crea el Frame que tendra guardado los datos de los Micros
+        frameMicro = tk.Frame(frame_canvasMicro, bg="gray", width = frame_canvasMicro.winfo_width())
+
+        frameMicro.grid_columnconfigure(0,weight = 1, pad = 50)
+        frameMicro.grid_columnconfigure(1,weight = 1, pad = 35)
+        frameMicro.grid_columnconfigure(2,weight = 1, pad = 35)
+        frameMicro.grid_columnconfigure(3,weight = 1, pad = 65)
+        frameMicro.grid_columnconfigure(4,weight = 1, pad = 40)
+        frameMicro.grid_columnconfigure(5,weight = 1, pad = 50)
+        frameMicro.grid_columnconfigure(6,weight = 1, pad = 15)
+        frameMicro.grid_columnconfigure(7,weight = 1, pad = 30)
+        
+        
+        canvasMicro.create_window((0, 0), window=frameMicro, anchor='nw')
+
+        #Se creo una ScrollBar para poder mostrar todos los Micros en un espacio compacto
+        vsb = tk.Scrollbar(frame_canvasMicro, orient="vertical", command=canvasMicro.yview, bg = "black")
+        vsb.grid(row=1, column=1, sticky='ns')
+        canvasMicro.configure(yscrollcommand=vsb.set)
+
+        #Entry para numero de micro seleccionado
+        labelQuantums = tk.Label(root, text = "Micros", font = costumFontSubTit).grid(row = 1, sticky='nw', column = 7)
+        entryNumMicro = tk.Entry(root)
+        entryNumMicro.grid(row = 2, column = 7, sticky='nw')
+
+        if entryNumMicro.get() == ' ':
+            row =len(self.microprocesadores[0].procesos)
+
+        else:
+            numMicroSel = entryNumMicro.get()
+            rows = len(self.microprocesadores[numMicroSel].procesos)
+
+        columns = 3
+
+        #Se crea el Lable que muestra el menu de la tabla
+        menuDeTablaMicros = tk.Label(frame_canvasMicro, text = "Proceso	    TCC	    TE	    TVC	    TB	    TT	    TI	    TF       ", bg = "red")
+        menuDeTablaMicros.grid(row = 0, column = 0)
+        
+        #Agrega cada proceso al Frame por Nombre, Tamao, Tiempo de Entrada y Bloqueo
+        
+        for i in range(0, rows):
+            procesoNom = tk.Label (frameMicro, text = self.microprocesadores[numMicroSel].procesos[i].name, bg = "gray",fg = "white")
+            procesoNom.grid(row = i, column=0)
+            procesoTCC = tk.Label (frameMicro, text = str(self.microprocesadores[numMicroSel].procesos[i].tcc),bg = "gray", fg = "white")
+            procesoTCC.grid(row = i, column=1)
+            procesoTiempo = tk.Label (frameMicro, text = str(self.microprocesadores[0].procesos[i].tiempoEjecucion),bg = "gray",fg = "white")
+            procesoTiempo.grid(row = i, column=2)
+            procesoBloq = tk.Label (frameMicro, text = str(self.microprocesadores[0].procesos[i].tvc),bg = "gray",fg = "white")
+            procesoBloq.grid(row = i, column=3)
+            procesoTiempo = tk.Label (frameMicro, text = str(self.microprocesadores[0].procesos[i].tb),bg = "gray",fg = "white")
+            procesoTiempo.grid(row = i, column=4)
+            procesoBloq = tk.Label (frameMicro, text = str(self.microprocesadores[0].procesos[i].tt),bg = "gray",fg = "white")
+            procesoBloq.grid(row = i, column=5)
+            procesoTiempo = tk.Label (frameMicro, text = str(self.microprocesadores[0].procesos[i].ti),bg = "gray",fg = "white")
+            procesoTiempo.grid(row = i, column=6)
+            procesoBloq = tk.Label (frameMicro, text = str(self.microprocesadores[0].procesos[i].tf),bg = "gray",fg = "white")
+            procesoBloq.grid(row = i, column=7)
+
+        frameMicro.update_idletasks() 
+        canvasMicro.config(scrollregion=canvasMicro.bbox("all"))
+
         button.pack
         root.mainloop()
 
@@ -206,7 +287,7 @@ def main():
     despachador.lecturaDeArchivo()
     #Todo esto se va leer del txt
     numeroProcesos = 17
-    numeroMicros = 2
+    numeroMicros = 1
     #Ver como arreglo excepcion cuando se pasa de 16
     tiempoBloqueo = 10
     tiempoCambio = 10
@@ -222,7 +303,7 @@ def main():
 
     despachador.aniadirProcesos(duracionQuantum, numeroProcesos, nombres, tiemposEjecucion, numBloqueos, tiempoBloqueo, tiempoCambio)
     despachador.imprimirEstado()
-    #despachador.interfaz()
+    despachador.interfaz()
     
 
 
