@@ -62,8 +62,16 @@ class Despachador():
             for j in range(len(self.microprocesadores)):
                 if len(self.microprocesadores[j].procesos) == 0 :
                     print("")
-                    tt = tiemposEjecucion[j] + tvc + numBloqueos[j]*duracionBloqueo  
-                    proceso = Procesos(names[j], tt, tiemposEjecucion[j], 0, tvc, tb, 0, tt)
+                    tt = tiemposEjecucion[j] + tvc + numBloqueos[j]*duracionBloqueo
+                    #proceso = Procesos(names[j], tt, tiemposEjecucion[j], 0, tvc, tb, 0, tt)
+                    if tEntrada[j] > 0:
+                        ti = tEntrada[j]
+                        proceso = Procesos(names[j], tt, tiemposEjecucion[j], 0, tvc, tb, ti, ti + tt)
+                    else:
+                        ti = self.microprocesadores[0].procesos[i-1].tf
+                        proceso = Procesos(names[j], tt, tiemposEjecucion[j], 0, tvc, tb, 0, tt)
+                    
+
                     self.microprocesadores[j].procesos.append(proceso)
                     self.accept = False
                     self.counter += 1
@@ -96,9 +104,16 @@ class Despachador():
                         self.microprocesadores[self.index].procesos.append(proceso)
                     self.counter += 1
                 else:
-                    tt = duracionCambio + tiemposEjecucion[i] + tvc + numBloqueos[i]*duracionBloqueo
-                    ti = self.microprocesadores[0].procesos[i-1].tf
-                    proceso = Procesos(names[i], duracionCambio, tvc, tiemposEjecucion[i], tb, ti, tt, ti + tt)
+                    if self.microprocesadores[0].procesos[i-1].tf < tEntrada[i]:
+                        ti = tEntrada[i]
+                        tt = tiemposEjecucion[i] + tvc + numBloqueos[i]*duracionBloqueo
+                        proceso = Procesos(names[i], tt, tiemposEjecucion[i], 0, tvc, tb, ti, ti + tt)
+                    else:
+                        ti = self.microprocesadores[0].procesos[i-1].tf
+                        tt = duracionCambio + tiemposEjecucion[i] + tvc + numBloqueos[i]*duracionBloqueo
+                        proceso = Procesos(names[i], tt, tiemposEjecucion[i], duracionCambio, tvc, tb, ti, ti + tt)
+
+                    
                     self.microprocesadores[0].procesos.append(proceso)
 
     
