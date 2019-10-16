@@ -22,6 +22,7 @@ class Microprocesador():
 class Despachador():
     pass
     tiempoMenor = 0
+    tiempoEn =0
     index = 0
     counter = 0
     microprocesadores = []
@@ -39,6 +40,7 @@ class Despachador():
     canvasMicro= None
     frameMicro = None
     accept = True
+    tiemposEntrada=[]
 
     
 
@@ -47,7 +49,7 @@ class Despachador():
         self.microprocesadores.append(micro)
 
     
-    def aniadirProcesos(self, duracionQuantum, num, names, tiemposEjecucion, numBloqueos, duracionBloqueo, duracionCambio):
+    def aniadirProcesos(self, duracionQuantum, num, names, tiemposEjecucion, numBloqueos, duracionBloqueo, duracionCambio, tEntrada):
 
         #Aqui se debe revisar el numero de microprocesadores
 
@@ -61,7 +63,7 @@ class Despachador():
                 if len(self.microprocesadores[j].procesos) == 0 :
                     print("")
                     tt = tiemposEjecucion[j] + tvc + numBloqueos[j]*duracionBloqueo  
-                    proceso = Procesos(names[j], 0, tvc, tiemposEjecucion[j], tb, tt,0, tt)
+                    proceso = Procesos(names[j], tt, tiemposEjecucion[j], 0, tvc, tb, 0, tt)
                     self.microprocesadores[j].procesos.append(proceso)
                     self.accept = False
                     self.counter += 1
@@ -81,9 +83,16 @@ class Despachador():
                             self.tiempoMenor = self.microprocesadores[k].procesos[lene-1].tf
                             self.index = k
                     if self.counter < num:
-                        tt = duracionCambio + tiemposEjecucion[self.counter] + tvc + numBloqueos[self.counter]*duracionBloqueo
-                        ti = self.tiempoMenor
-                        proceso = Procesos(names[self.counter], duracionCambio, tvc, tiemposEjecucion[self.counter], tb, ti, tt, ti + tt)
+                        self.tiempoEn = tEntrada[self.counter]
+                        if self.tiempoMenor < self.tiempoEn:
+                            ti = self.tiempoEn
+                            tt = tiemposEjecucion[self.counter] + tvc + numBloqueos[self.counter]*duracionBloqueo
+                            proceso = Procesos(names[self.counter], tt, tiemposEjecucion[self.counter], 0, tvc, tb, ti, ti + tt)
+                        else:
+                            ti = self.tiempoMenor
+                            tt = duracionCambio + tiemposEjecucion[self.counter] + tvc + numBloqueos[self.counter]*duracionBloqueo
+                            proceso = Procesos(names[self.counter], tt, tiemposEjecucion[self.counter], duracionCambio, tvc, tb, ti, ti + tt)
+                        
                         self.microprocesadores[self.index].procesos.append(proceso)
                     self.counter += 1
                 else:
@@ -299,7 +308,7 @@ def main():
     despachador.lecturaDeArchivo()
     #Todo esto se va leer del txt
     numeroProcesos = 17
-    numeroMicros = 2
+    numeroMicros = 3
     
     tiempoBloqueo = 10
     tiempoCambio = 10
@@ -309,11 +318,12 @@ def main():
     #Estos deben coincidir con las letras de arriba
     numBloqueos = [1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2]
     tiemposEjecucion = [1000,300,300,208,100,1000,300,200,100,1000,1200,200,100,300,400,100,210]
+    tiemposEntrada = [3000,0,3000,0,3000,0,3000,0,3000,1500,4000,1500,4000,1500,8000,1500,4000]
 
     for i in range(numeroMicros):
         despachador.aniadirMicroprocesador(i+1)
 
-    despachador.aniadirProcesos(duracionQuantum, numeroProcesos, nombres, tiemposEjecucion, numBloqueos, tiempoBloqueo, tiempoCambio)
+    despachador.aniadirProcesos(duracionQuantum, numeroProcesos, nombres, tiemposEjecucion, numBloqueos, tiempoBloqueo, tiempoCambio, tiemposEntrada)
     despachador.imprimirEstado()
     despachador.interfaz()
     
