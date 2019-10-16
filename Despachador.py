@@ -60,38 +60,40 @@ class Despachador():
             tb = numBloqueos[i]*duracionBloqueo
             
             for j in range(len(self.microprocesadores)):
-                if len(self.microprocesadores[j].procesos) == 0 :
-                    print("")
-                    tb = numBloqueos[j]*duracionBloqueo
-                    tvc = ((math.ceil(tiemposEjecucion[j] / float(duracionQuantum))) - 1) * duracionCambio
-                    tt = tiemposEjecucion[j] + tvc + numBloqueos[j]*duracionBloqueo
-                    #proceso = Procesos(names[j], tt, tiemposEjecucion[j], 0, tvc, tb, 0, tt)
-                    if tEntrada[j] > 0:
-                        ti = tEntrada[j]
-                        proceso = Procesos(names[j], tt, tiemposEjecucion[j], 0, tvc, tb, ti, ti + tt)
-                    else:
-                        ti = self.microprocesadores[0].procesos[i-1].tf
-                        proceso = Procesos(names[j], tt, tiemposEjecucion[j], 0, tvc, tb, 0, tt)
-                    
+                if j < num:
+                    if len(self.microprocesadores[j].procesos) == 0 :
+                        print("")
+                        tb = numBloqueos[j]*duracionBloqueo
+                        tvc = ((math.ceil(tiemposEjecucion[j] / float(duracionQuantum))) - 1) * duracionCambio
+                        tt = tiemposEjecucion[j] + tvc + numBloqueos[j]*duracionBloqueo
+                        #proceso = Procesos(names[j], tt, tiemposEjecucion[j], 0, tvc, tb, 0, tt)
+                        if tEntrada[j] > 0:
+                            ti = tEntrada[j]
+                            proceso = Procesos(names[j], tt, tiemposEjecucion[j], 0, tvc, tb, ti, ti + tt)
+                        else:
+                            ti = self.microprocesadores[0].procesos[i-1].tf
+                            proceso = Procesos(names[j], tt, tiemposEjecucion[j], 0, tvc, tb, 0, tt)
+                        
 
-                    self.microprocesadores[j].procesos.append(proceso)
-                    self.accept = False
-                    self.counter += 1
-                    if j == 0:
-                        self.tiempoMenor = tt
-                    print(self.tiempoMenor)
+                        self.microprocesadores[j].procesos.append(proceso)
+                        self.accept = False
+                        self.counter += 1
+                        if j == 0:
+                            self.tiempoMenor = tt
+                        print(self.tiempoMenor)
             if self.accept != False:
                 if len(self.microprocesadores)>1:
                     for k in range(len(self.microprocesadores)):
                         #print("LENEEEEEEE")
                         lene = len(self.microprocesadores[k].procesos)
                         print(lene)
-                        if self.tiempoMenor> self.microprocesadores[k].procesos[lene-1].tf:
-                            print("Tiempo ")
-                            print(self.tiempoMenor)
-                            print(self.microprocesadores[k].procesos[lene-1].tf)
-                            self.tiempoMenor = self.microprocesadores[k].procesos[lene-1].tf
-                            self.index = k
+                        if k < num:
+                            if self.tiempoMenor> self.microprocesadores[k].procesos[lene-1].tf:
+                                print("Tiempo ")
+                                print(self.tiempoMenor)
+                                print(self.microprocesadores[k].procesos[lene-1].tf)
+                                self.tiempoMenor = self.microprocesadores[k].procesos[lene-1].tf
+                                self.index = k
                     if self.counter < num:
                         self.tiempoEn = tEntrada[self.counter]
                         tb = numBloqueos[self.counter]*duracionBloqueo
@@ -327,8 +329,8 @@ def main():
     despachador = Despachador()
     despachador.lecturaDeArchivo()
     #Todo esto se va leer del txt
-    numeroProcesos = 17
-    numeroMicros = 10
+    numeroProcesos = 16
+    numeroMicros = 100
     
     tiempoBloqueo = 10
     tiempoCambio = 10
@@ -337,7 +339,7 @@ def main():
     nombres = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "Q", "O", "P"]
     #Estos deben coincidir con las letras de arriba
     numBloqueos = [1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2]
-    tiemposEjecucion = [1000,300,300,208,100,1000,300,200,100,1000,1200,200,100,300,400,100,210]
+    tiemposEjecucion = [1000,300,300,208,100,1000,300,200,100,1000,1200,200,100,300,400,100, 260]
     tiemposEntrada = [3000,0,3000,0,3000,0,3000,0,3000,1500,4000,1500,4000,1500,8000,1500,4000]
 
     for i in range(numeroMicros):
