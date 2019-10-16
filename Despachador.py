@@ -62,6 +62,8 @@ class Despachador():
             for j in range(len(self.microprocesadores)):
                 if len(self.microprocesadores[j].procesos) == 0 :
                     print("")
+                    tb = numBloqueos[j]*duracionBloqueo
+                    tvc = ((math.ceil(tiemposEjecucion[j] / float(duracionQuantum))) - 1) * duracionCambio
                     tt = tiemposEjecucion[j] + tvc + numBloqueos[j]*duracionBloqueo
                     #proceso = Procesos(names[j], tt, tiemposEjecucion[j], 0, tvc, tb, 0, tt)
                     if tEntrada[j] > 0:
@@ -92,7 +94,10 @@ class Despachador():
                             self.index = k
                     if self.counter < num:
                         self.tiempoEn = tEntrada[self.counter]
+                        tb = numBloqueos[self.counter]*duracionBloqueo
+                        tvc = ((math.ceil(tiemposEjecucion[self.counter] / float(duracionQuantum))) - 1) * duracionCambio
                         if self.tiempoMenor < self.tiempoEn:
+                            #tvc = ((math.ceil(tiemposEjecucion[self.counter] / float(duracionQuantum))) - 1) * duracionCambio
                             ti = self.tiempoEn
                             tt = tiemposEjecucion[self.counter] + tvc + numBloqueos[self.counter]*duracionBloqueo
                             proceso = Procesos(names[self.counter], tt, tiemposEjecucion[self.counter], 0, tvc, tb, ti, ti + tt)
@@ -323,7 +328,7 @@ def main():
     despachador.lecturaDeArchivo()
     #Todo esto se va leer del txt
     numeroProcesos = 17
-    numeroMicros = 3
+    numeroMicros = 10
     
     tiempoBloqueo = 10
     tiempoCambio = 10
