@@ -30,17 +30,29 @@ class Despachador():
     tamanioDeProceso = []
     tiempoDeEntrada = []
     cantidadDeBloqueo = []
+
     numDeMicro = None
     entryMicro = None
     entryNumMicro = None
     entryQuantums = None
     labelNumDeMicros= None
-    root = None
+    canBloque = None
+    entryBloque = None
+    cambioCon = None
+    entryCambio = None
+    root = tk.Tk()
     frame_canvasMicro= None
     canvasMicro= None
     frameMicro = None
     accept = True
     tiemposEntrada=[]
+    rows = 0
+
+    #Variables de la Tabla de Micros 
+    procesoNom = tk.Label(root)
+    procesoTCC = tk.Label(root)
+    procesoTiempo = tk.Label(root)
+    procesoBloq = tk.Label(root) 
 
     
 
@@ -60,38 +72,36 @@ class Despachador():
             tb = numBloqueos[i]*duracionBloqueo
             
             for j in range(len(self.microprocesadores)):
-                if len(self.microprocesadores[j].procesos) == 0 :
-                    print("")
-                    tb = numBloqueos[j]*duracionBloqueo
-                    tvc = ((math.ceil(tiemposEjecucion[j] / float(duracionQuantum))) - 1) * duracionCambio
-                    tt = tiemposEjecucion[j] + tvc + numBloqueos[j]*duracionBloqueo
-                    #proceso = Procesos(names[j], tt, tiemposEjecucion[j], 0, tvc, tb, 0, tt)
-                    if tEntrada[j] > 0:
-                        ti = tEntrada[j]
-                        proceso = Procesos(names[j], tt, tiemposEjecucion[j], 0, tvc, tb, ti, ti + tt)
-                    else:
-                        ti = self.microprocesadores[0].procesos[i-1].tf
-                        proceso = Procesos(names[j], tt, tiemposEjecucion[j], 0, tvc, tb, 0, tt)
-                    
+                if j < num:
+                    print(self.microprocesadores[j].procesos)
+                    if len(self.microprocesadores[j].procesos) == 0:
+                        print("HOLLOOOO")
+                        tb = numBloqueos[j]*duracionBloqueo
+                        tvc = ((math.ceil(tiemposEjecucion[j] / float(duracionQuantum))) - 1) * duracionCambio
+                        tt = tiemposEjecucion[j] + tvc + numBloqueos[j]*duracionBloqueo
+                        #proceso = Procesos(names[j], tt, tiemposEjecucion[j], 0, tvc, tb, 0, tt)
+                        if tEntrada[j] > 0:
+                            ti = tEntrada[j]
+                            proceso = Procesos(names[j], tt, tiemposEjecucion[j], 0, tvc, tb, ti, ti + tt)
+                        else:
+                            ti = 0
+                            proceso = Procesos(names[j], tt, tiemposEjecucion[j], 0, tvc, tb, 0, tt)
+                        
 
-                    self.microprocesadores[j].procesos.append(proceso)
-                    self.accept = False
-                    self.counter += 1
-                    if j == 0:
-                        self.tiempoMenor = tt
-                    print(self.tiempoMenor)
+                        self.microprocesadores[j].procesos.append(proceso)
+                        self.accept = False
+                        self.counter += 1
+                        if j == 0:
+                            self.tiempoMenor = tt
+                        print(self.tiempoMenor)
             if self.accept != False:
                 if len(self.microprocesadores)>1:
                     for k in range(len(self.microprocesadores)):
-                        #print("LENEEEEEEE")
                         lene = len(self.microprocesadores[k].procesos)
-                        print(lene)
-                        if self.tiempoMenor> self.microprocesadores[k].procesos[lene-1].tf:
-                            print("Tiempo ")
-                            print(self.tiempoMenor)
-                            print(self.microprocesadores[k].procesos[lene-1].tf)
-                            self.tiempoMenor = self.microprocesadores[k].procesos[lene-1].tf
-                            self.index = k
+                        if k < num:
+                            if self.tiempoMenor> self.microprocesadores[k].procesos[lene-1].tf:
+                                self.tiempoMenor = self.microprocesadores[k].procesos[lene-1].tf
+                                self.index = k
                     if self.counter < num:
                         self.tiempoEn = tEntrada[self.counter]
                         tb = numBloqueos[self.counter]*duracionBloqueo
@@ -121,6 +131,7 @@ class Despachador():
                     
                     self.microprocesadores[0].procesos.append(proceso)
 
+
     
     
     def imprimirEstado(self):
@@ -138,52 +149,56 @@ class Despachador():
            linea=archivo.readlines()
            for x in linea:
                 lineaActual = x.split(',')
-                print(lineaActual[0], " ", lineaActual[1], " ", lineaActual[2], " ", lineaActual[3])
                 self.listaDeProcesos.append(lineaActual[0])
                 self.tamanioDeProceso.append(lineaActual[1])
                 self.tiempoDeEntrada.append(lineaActual[2])
                 self.cantidadDeBloqueo.append(lineaActual[3])
             
-        for i in range(len(self.listaDeProcesos)):
-            print(self.listaDeProcesos[i])
+      
 
     def prueba(self):
         self.lecturaDeArchivo()
         self.numDeMicro = self.entryMicro.get()
         print(self.numDeMicro)
-       
+
+        
+        self.procesoNom.destroy()
+        self.procesoTCC.destroy()
+        self.procesoTiempo.destroy()
+        self.procesoBloq.destroy()
+
         if self.entryNumMicro.get() == ' ':
-            row =len(self.microprocesadores[0].procesos)
+            self.rows=len(self.microprocesadores[0].procesos)
 
         else:
             numMicroSel = int(self.entryNumMicro.get())-1
-            rows = len(self.microprocesadores[numMicroSel].procesos)
+            self.rows = len(self.microprocesadores[numMicroSel].procesos)
 
         columns = 3
         #Agrega cada proceso al Frame por Nombre, Tamao, Tiempo de Entrada y Bloqueo
         
-        for i in range(0, rows):
-            procesoNom = tk.Label (self.frameMicro, text = self.microprocesadores[numMicroSel].procesos[i].name, bg = "gray",fg = "white")
-            procesoNom.grid(row = i, column=0)
-            procesoTCC = tk.Label (self.frameMicro, text = str(self.microprocesadores[numMicroSel].procesos[i].tcc),bg = "gray", fg = "white")
-            procesoTCC.grid(row = i, column=1)
-            procesoTiempo = tk.Label (self.frameMicro, text = str(self.microprocesadores[0].procesos[i].tiempoEjecucion),bg = "gray",fg = "white")
-            procesoTiempo.grid(row = i, column=2)
-            procesoBloq = tk.Label (self.frameMicro, text = str(self.microprocesadores[0].procesos[i].tvc),bg = "gray",fg = "white")
-            procesoBloq.grid(row = i, column=3)
-            procesoTiempo = tk.Label (self.frameMicro, text = str(self.microprocesadores[0].procesos[i].tb),bg = "gray",fg = "white")
-            procesoTiempo.grid(row = i, column=4)
-            procesoBloq = tk.Label (self.frameMicro, text = str(self.microprocesadores[0].procesos[i].tt),bg = "gray",fg = "white")
-            procesoBloq.grid(row = i, column=5)
-            procesoTiempo = tk.Label (self.frameMicro, text = str(self.microprocesadores[0].procesos[i].ti),bg = "gray",fg = "white")
-            procesoTiempo.grid(row = i, column=6)
-            procesoBloq = tk.Label (self.frameMicro, text = str(self.microprocesadores[0].procesos[i].tf),bg = "gray",fg = "white")
-            procesoBloq.grid(row = i, column=7)
+        for i in range(0, self.rows):
+            self.procesoNom = tk.Label (self.frameMicro, text = self.microprocesadores[numMicroSel].procesos[i].name, bg = "gray",fg = "white")
+            self.procesoNom.grid(row = i, column=0)
+            self.procesoTCC = tk.Label (self.frameMicro, text = str(self.microprocesadores[numMicroSel].procesos[i].tcc),bg = "gray", fg = "white")
+            self.procesoTCC.grid(row = i, column=1)
+            self.procesoTiempo = tk.Label (self.frameMicro, text = str(self.microprocesadores[numMicroSel].procesos[i].tiempoEjecucion),bg = "gray",fg = "white")
+            self.procesoTiempo.grid(row = i, column=2)
+            self.procesoBloq = tk.Label (self.frameMicro, text = str(self.microprocesadores[numMicroSel].procesos[i].tvc),bg = "gray",fg = "white")
+            self.procesoBloq.grid(row = i, column=3)
+            self.procesoTiempo = tk.Label (self.frameMicro, text = str(self.microprocesadores[numMicroSel].procesos[i].tb),bg = "gray",fg = "white")
+            self.procesoTiempo.grid(row = i, column=4)
+            self.procesoBloq = tk.Label (self.frameMicro, text = str(self.microprocesadores[numMicroSel].procesos[i].tt),bg = "gray",fg = "white")
+            self.procesoBloq.grid(row = i, column=5)
+            self.procesoTiempo = tk.Label (self.frameMicro, text = str(self.microprocesadores[numMicroSel].procesos[i].ti),bg = "gray",fg = "white")
+            self.procesoTiempo.grid(row = i, column=6)
+            self.procesoBloq = tk.Label (self.frameMicro, text = str(self.microprocesadores[numMicroSel].procesos[i].tf),bg = "gray",fg = "white")
+            self.procesoBloq.grid(row = i, column=7)
 
         
        
     def interfaz (self):
-        self.root = tk.Tk()
+        
         self.root.config(width=300, height=200)
         
         #Disenio de las letras
@@ -219,9 +234,14 @@ class Despachador():
         self.entryQuantums = tk.Entry(canvasDatos).grid(row = 0, column = 1, sticky='nw')
 
          #Se crea las Labels y Caja de taxto de Numero de Micros
-        labelMicro = tk.Label(canvasDatos, text = "Numero de micros" , font = costumFontSubTit).grid(row = 1, sticky='nw' ,column = 0)
+        labelMicro = tk.Label(canvasDatos, text = "Cantidad de micros" , font = costumFontSubTit).grid(row = 1, sticky='nw' ,column = 0)
         self.entryMicro = tk.Entry(canvasDatos)
         self.entryMicro.grid(row = 1 , column = 1, sticky='nw')
+
+        #Entry para numero de micro seleccionado
+        self.labelNumDeMicros = tk.Label(canvasDatos, text = "Numero de Micro", font = costumFontSubTit).grid(row = 2, sticky='nw', column = 0)
+        self.entryNumMicro = tk.Entry(canvasDatos)
+        self.entryNumMicro.grid(row = 2, column = 1, sticky='nw')
         
         #Se creo el boton de Mostrar tabla
         #Llama a funcion de aniadirMicro
@@ -274,10 +294,6 @@ class Despachador():
         frameProcesos.update_idletasks() 
         canvas.config(scrollregion=canvas.bbox("all"))
 
-        #Entry para numero de micro seleccionado
-        self.labelNumDeMicros = tk.Label(self.root, text = "Micros", font = costumFontSubTit).grid(row = 1, sticky='nw', column = 7)
-        self.entryNumMicro = tk.Entry(self.root)
-        self.entryNumMicro.grid(row = 2, column = 7, sticky='nw')
 
          #Se crea el primer Frame de la lista de Micros
         
@@ -328,24 +344,24 @@ def main():
     despachador.lecturaDeArchivo()
     #Todo esto se va leer del txt
     numeroProcesos = 17
-    numeroMicros = 10
+    numeroMicros = 2
     
-    tiempoBloqueo = 10
-    tiempoCambio = 10
-    duracionQuantum = 100
+    tiempoBloqueo = 15
+    tiempoCambio = 15
+    duracionQuantum = 3000
     #Procurar ponerlos en orden de ejecucion
-    nombres = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "Q", "O", "P"]
+    nombres = ["B", "D", "F", "H", "J", "L", "N", "O", "A", "C", "E", "G", "I", "K", "M", "P", "Z"]
     #Estos deben coincidir con las letras de arriba
-    numBloqueos = [1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2]
-    tiemposEjecucion = [1000,300,300,208,100,1000,300,200,100,1000,1200,200,100,300,400,100,210]
-    tiemposEntrada = [3000,0,3000,0,3000,0,3000,0,3000,1500,4000,1500,4000,1500,8000,1500,4000]
+    numBloqueos = [2,2,3,4,2,5,2,3,2,2,5,2,3,2,2,4,3]
+    tiemposEjecucion = [300,100,500,700,300,3000,50,600,400,50,1000,10,450,100,80,800,500]
+    tiemposEntrada = [0,0,0,0,1500,1500,1500,1500,3000,3000,3000,3000,3000,4000,4000,4000,8000]
 
     for i in range(numeroMicros):
         despachador.aniadirMicroprocesador(i+1)
 
     despachador.aniadirProcesos(duracionQuantum, numeroProcesos, nombres, tiemposEjecucion, numBloqueos, tiempoBloqueo, tiempoCambio, tiemposEntrada)
     despachador.imprimirEstado()
-    despachador.interfaz()
+    #despachador.interfaz()
     
 
 
