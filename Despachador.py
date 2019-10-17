@@ -344,10 +344,10 @@ def main():
     despachador.lecturaDeArchivo()
     #Todo esto se va leer del txt
     numeroProcesos = 17
-    numeroMicros = 2
+    numeroMicros = 10
     
-    tiempoBloqueo = 15
-    tiempoCambio = 15
+    tiempoBloqueo = 0
+    tiempoCambio = 10
     duracionQuantum = 3000
     #Procurar ponerlos en orden de ejecucion
     nombres = ["B", "D", "F", "H", "J", "L", "N", "O", "A", "C", "E", "G", "I", "K", "M", "P", "Z"]
