@@ -41,13 +41,14 @@ class Despachador():
     cambioCon = None
     entryCambio = None
     root = tk.Tk()
-    frame_canvasMicro= None
-    canvasMicro= None
-    frameMicro = None
     accept = True
-    frame_canvasListaMicro = None
     tiemposEntrada=[]
     rows = 0
+
+    frame_canvasMicro= tk.Frame()
+    canvasMicro= tk.Canvas()
+    frameMicro = tk.Frame()
+    frame_canvasListaMicro = tk.Frame()
 
     #Variables de la Tabla de Micros 
     procesoNom = tk.Label(root)
@@ -74,9 +75,8 @@ class Despachador():
             
             for j in range(len(self.microprocesadores)):
                 if j < num:
-                    print(self.microprocesadores[j].procesos)
                     if len(self.microprocesadores[j].procesos) == 0:
-                        print("HOLLOOOO")
+                        
                         tb = numBloqueos[j]*duracionBloqueo
                         tvc = ((math.ceil(tiemposEjecucion[j] / float(duracionQuantum))) - 1) * duracionCambio
                         tt = tiemposEjecucion[j] + tvc + numBloqueos[j]*duracionBloqueo
@@ -94,7 +94,7 @@ class Despachador():
                         self.counter += 1
                         if j == 0:
                             self.tiempoMenor = tt
-                        print(self.tiempoMenor)
+                        
             if self.accept != False:
                 if len(self.microprocesadores)>1:
                     for k in range(len(self.microprocesadores)):
@@ -160,7 +160,7 @@ class Despachador():
     def prueba(self):
         self.lecturaDeArchivo()
         numeroProcesos = 17
-
+        self.microprocesadores.clear()
         numeroMicros = int(self.entryMicro.get())
         tiempoBloqueo = int(self.entryBloque.get())
         tiempoCambio = int(self.entryCambio.get())
@@ -177,14 +177,28 @@ class Despachador():
             self.aniadirMicroprocesador(i+1)
 
         self.aniadirProcesos(duracionQuantum, numeroProcesos, nombres, tiemposEjecucion, numBloqueos, tiempoBloqueo, tiempoCambio, tiemposEntrada)
-        self.imprimirEstado
+        self.imprimirEstado()
 
+        self.frame_canvasListaMicro.destroy()
+        self.frame_canvasMicro.destroy()
+        self.procesoNom.destroy()
+        self.procesoTCC.destroy() 
+        self.procesoTiempo.destroy() 
+        self.procesoBloq.destroy() 
+        self.canvasMicro.destroy()
+        self.frameMicro.destroy()
 
         self.frame_canvasListaMicro = tk.Canvas(self.root, bg = "red", highlightbackground="black" , highlightthickness = 2 )
         self.frame_canvasListaMicro.grid(row=3 , column=7,  sticky='nw')
         self.frame_canvasListaMicro.grid_rowconfigure(0, weight=1)
         self.frame_canvasListaMicro.grid_columnconfigure(0, weight=1)
 
+
+        vsb = tk.Scrollbar(self.frame_canvasListaMicro, orient="vertical", command=self.frame_canvasListaMicro.yview)
+        vsb.grid(row = 0, column=1, sticky='ns')
+        self.frame_canvasListaMicro.configure(yscrollcommand=vsb.set)
+        #canvas.create_window((0, 0), window=self.frame_canvasListaMicro, anchor='ne')
+    
         for j in range(0,len(self.microprocesadores)):
 
             #Se crea el primer Frame de la lista de Micros  
@@ -208,8 +222,6 @@ class Despachador():
             self.frameMicro.grid_columnconfigure(5,weight = 1, pad = 50)
             self.frameMicro.grid_columnconfigure(6,weight = 1, pad = 15)
             self.frameMicro.grid_columnconfigure(7,weight = 1, pad = 30)
-            
-            
             self.canvasMicro.create_window((0, 0), window=self.frameMicro, anchor='nw')
 
             #Se creo una ScrollBar para poder mostrar todos los Micros en un espacio compacto
@@ -222,8 +234,6 @@ class Despachador():
             menuDeTablaMicros = tk.Label(self.frame_canvasMicro, text = "Proceso	    TCC	    TE	    TVC	    TB	    TT	    TI	    TF       ", bg = "red")
             menuDeTablaMicros.grid(row = 0, column = 0)
 
-            self.frameMicro.update_idletasks() 
-            self.canvasMicro.config(scrollregion=self.canvasMicro.bbox("all"))
 
             self.rows = len(self.microprocesadores[j].procesos)
 
@@ -249,16 +259,16 @@ class Despachador():
                 self.procesoBloq = tk.Label (self.frameMicro, text = str(self.microprocesadores[j].procesos[i].tf),bg = "gray",fg = "white")
                 self.procesoBloq.grid(row = i, column=7)
 
-        vsb = tk.Scrollbar(self.frame_canvasListaMicro, orient="vertical", command=self.frame_canvasListaMicro.yview)
+            self.frameMicro.update_idletasks() 
+            self.canvasMicro.config(scrollregion=self.canvasMicro.bbox("all"))
 
-        vsb.grid(row = 1, column=1, sticky='ns')
-        self.frame_canvasListaMicro.configure(yscrollcommand=vsb.set)
-
+       
+        self.frame_canvasListaMicro.update_idletasks() 
         self.frame_canvasListaMicro.config(scrollregion=self.frame_canvasListaMicro.bbox("all"))
        
     def interfaz (self):
         
-        self.root.config(width=300, height=200)
+        self.root.config(width=700, height=200)
         
         #Disenio de las letras
         costumFontTitulo = tkFont.Font(family = "Bernard MT", size = 35, weight=tkFont.BOLD)
@@ -369,6 +379,7 @@ class Despachador():
 def main():
     
     despachador = Despachador()
+    despachador.lecturaDeArchivo()
     '''
     despachador.lecturaDeArchivo()
     #Todo esto se va leer del txt
