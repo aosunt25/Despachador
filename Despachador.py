@@ -160,7 +160,13 @@ class Despachador():
     def prueba(self):
         self.lecturaDeArchivo()
         numeroProcesos = 17
+
         self.microprocesadores.clear()
+        self.tiempoMenor = 0
+        self.tiempoEn =0
+        self.index = 0
+        self.counter = 0
+
         numeroMicros = int(self.entryMicro.get())
         tiempoBloqueo = int(self.entryBloque.get())
         tiempoCambio = int(self.entryCambio.get())
@@ -188,31 +194,43 @@ class Despachador():
         self.canvasMicro.destroy()
         self.frameMicro.destroy()
 
-        self.frame_canvasListaMicro = tk.Canvas(self.root, bg = "red", highlightbackground="black" , highlightthickness = 2 )
+        self.frame_canvasListaMicro = tk.Frame(self.root, bg = "white", highlightbackground="black" , highlightthickness = 2)
         self.frame_canvasListaMicro.grid(row=3 , column=7,  sticky='nw')
         self.frame_canvasListaMicro.grid_rowconfigure(0, weight=1)
         self.frame_canvasListaMicro.grid_columnconfigure(0, weight=1)
 
+        canvas = tk.Canvas(self.frame_canvasListaMicro, bg="white")
+        canvas.grid(row=1, column=0, sticky="news")
 
-        vsb = tk.Scrollbar(self.frame_canvasListaMicro, orient="vertical", command=self.frame_canvasListaMicro.yview)
-        vsb.grid(row = 0, column=1, sticky='ns')
-        self.frame_canvasListaMicro.configure(yscrollcommand=vsb.set)
-        #canvas.create_window((0, 0), window=self.frame_canvasListaMicro, anchor='ne')
+        frame = tk.Frame(self.frame_canvasListaMicro, bg="white")
+        
+
+        vsb = tk.Scrollbar(self.frame_canvasListaMicro, orient="vertical", command=canvas.yview)
+        vsb.grid(row = 1, column=1, sticky='ns')
+
+        canvas.configure(yscrollcommand=vsb.set)
+        
+        canvas.create_window((0, 0), window=frame, anchor='nw')
+
+        menuDeTablaMicros = tk.Label(self.frame_canvasListaMicro, text = "Proceso	    TCC	    TE	    TVC	    TB	    TT	    TI	    TF       llllllllllllllll", bg = "white", fg="white")
+        menuDeTablaMicros.grid(row = 0, column = 0)
+        
     
         for j in range(0,len(self.microprocesadores)):
 
             #Se crea el primer Frame de la lista de Micros  
-            self.frame_canvasMicro = tk.Frame(self.frame_canvasListaMicro, bg = "red", highlightbackground="black" , highlightthickness = 2 )
+            self.frame_canvasMicro = tk.Frame(frame, bg = "white", highlightbackground="black" , highlightthickness = 2)
             self.frame_canvasMicro.grid(row=j , column=0,  sticky='nw')
             self.frame_canvasMicro.grid_rowconfigure(0, weight=1)
             self.frame_canvasMicro.grid_columnconfigure(0, weight=1)
+            
             
             #Se creo el Canvas de la Lista de Micros 
             self.canvasMicro = tk.Canvas(self.frame_canvasMicro, bg="gray")
             self.canvasMicro.grid(row=1, column=0, sticky="news")
             
             #Se crea el Frame que tendra guardado los datos de los Micros
-            self.frameMicro = tk.Frame(self.frame_canvasMicro, bg="gray", width = self.frame_canvasMicro.winfo_width())
+            self.frameMicro = tk.Frame(self.frame_canvasMicro, bg="gray")
 
             self.frameMicro.grid_columnconfigure(0,weight = 1, pad = 50)
             self.frameMicro.grid_columnconfigure(1,weight = 1, pad = 35)
@@ -231,13 +249,12 @@ class Despachador():
 
 
             #Se crea el Lable que muestra el menu de la tabla
-            menuDeTablaMicros = tk.Label(self.frame_canvasMicro, text = "Proceso	    TCC	    TE	    TVC	    TB	    TT	    TI	    TF       ", bg = "red")
+
+            menuDeTablaMicros = tk.Label(self.frame_canvasMicro, text = "Proceso	 TCC	  TE	     TVC	      TB	        TT	           TI	           TF        ", bg = "red")
             menuDeTablaMicros.grid(row = 0, column = 0)
 
 
             self.rows = len(self.microprocesadores[j].procesos)
-
-             
             columns = 3
         #Agrega cada proceso al Frame por Nombre, Tamao, Tiempo de Entrada y Bloqueo
         
@@ -264,7 +281,8 @@ class Despachador():
 
        
         self.frame_canvasListaMicro.update_idletasks() 
-        self.frame_canvasListaMicro.config(scrollregion=self.frame_canvasListaMicro.bbox("all"))
+        canvas.config(scrollregion=canvas.bbox("all"))
+        
        
     def interfaz (self):
         
