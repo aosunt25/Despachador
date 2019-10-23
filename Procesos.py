@@ -1,6 +1,6 @@
 class Procesos:
 
-    def __init__(self, name, tt, tiempoEj, tcc, tvc, tb, ti, tf):
+    def __init__(self, name, tt, tiempoEj, tcc, tvc, tb, ti, tf, tEspera):
         self.name = name
         self.tcc = tcc
         self.tvc = tvc
@@ -9,3 +9,4 @@ class Procesos:
         self.tt = tt
         self.tf = tf
         self.tiempoEjecucion = tiempoEj
+        self.tEspera=tEspera

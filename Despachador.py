@@ -43,6 +43,11 @@ class Despachador():
     root = tk.Tk()
     accept = True
     tiemposEntrada=[]
+    aux = []
+    tiEntrada = False
+    noMoreZeros = False
+    des = False
+
     rows = 0
 
     frame_canvasMicro= tk.Frame()
@@ -66,84 +71,124 @@ class Despachador():
     def aniadirProcesos(self, duracionQuantum, num, names, tiemposEjecucion, numBloqueos, duracionBloqueo, duracionCambio, tEntrada):
 
         #Aqui se debe revisar el numero de microprocesadores
-
+        for j in range(len(self.microprocesadores)):
+                proceso = Procesos(" ",0,0,0,0,0,0,0,0)
+                self.microprocesadores[j].procesos.append(proceso)
+            
         for i in range(num):
+            self.des = False
+            print("AQUI")
+            print(names[i])
+            print(tEntrada[i])
+            self.tiEntrada = True
             self.tiempoMenor = 100000
             self.accept = True
             tvc = ((math.ceil(tiemposEjecucion[i] / float(duracionQuantum))) - 1) * duracionCambio
             tb = numBloqueos[i]*duracionBloqueo
             
-            for j in range(len(self.microprocesadores)):
-                if j < num:
-                    if len(self.microprocesadores[j].procesos) == 0:
-                        
-                        tb = numBloqueos[j]*duracionBloqueo
-                        tvc = ((math.ceil(tiemposEjecucion[j] / float(duracionQuantum))) - 1) * duracionCambio
-                        tt = tiemposEjecucion[j] + tvc + numBloqueos[j]*duracionBloqueo
-                        #proceso = Procesos(names[j], tt, tiemposEjecucion[j], 0, tvc, tb, 0, tt)
-                        if tEntrada[j] > 0:
-                            ti = tEntrada[j]
-                            proceso = Procesos(names[j], tt, tiemposEjecucion[j], 0, tvc, tb, ti, ti + tt)
-                        else:
-                            ti = 0
-                            proceso = Procesos(names[j], tt, tiemposEjecucion[j], 0, tvc, tb, 0, tt)
-                        
-
-                        self.microprocesadores[j].procesos.append(proceso)
-                        self.accept = False
-                        self.counter += 1
-                        if j == 0:
-                            self.tiempoMenor = tt
-                        
-            if self.accept != False:
-                if len(self.microprocesadores)>1:
-                    for k in range(len(self.microprocesadores)):
-                        lene = len(self.microprocesadores[k].procesos)
-                        if k < num:
-                            if self.tiempoMenor> self.microprocesadores[k].procesos[lene-1].tf:
-                                self.tiempoMenor = self.microprocesadores[k].procesos[lene-1].tf
-                                self.index = k
-                    if self.counter < num:
-                        self.tiempoEn = tEntrada[self.counter]
-                        tb = numBloqueos[self.counter]*duracionBloqueo
-                        tvc = ((math.ceil(tiemposEjecucion[self.counter] / float(duracionQuantum))) - 1) * duracionCambio
-                        if self.tiempoMenor < self.tiempoEn:
-                            #tvc = ((math.ceil(tiemposEjecucion[self.counter] / float(duracionQuantum))) - 1) * duracionCambio
-                            ti = self.tiempoEn
-                            tt = tiemposEjecucion[self.counter] + tvc + numBloqueos[self.counter]*duracionBloqueo
-                            proceso = Procesos(names[self.counter], tt, tiemposEjecucion[self.counter], 0, tvc, tb, ti, ti + tt)
-                        else:
-                            ti = self.tiempoMenor
-                            tt = duracionCambio + tiemposEjecucion[self.counter] + tvc + numBloqueos[self.counter]*duracionBloqueo
-                            proceso = Procesos(names[self.counter], tt, tiemposEjecucion[self.counter], duracionCambio, tvc, tb, ti, ti + tt)
-                        
-                        self.microprocesadores[self.index].procesos.append(proceso)
-                    self.counter += 1
-                else:
-                    if self.microprocesadores[0].procesos[i-1].tf < tEntrada[i]:
-                        ti = tEntrada[i]
+            if len(self.microprocesadores) == 1:
+                print(self.microprocesadores[0].procesos[i].tf) 
+                print(tEntrada[i])
+                if self.microprocesadores[0].procesos[i].tf >= tEntrada[i]:
+                    if i == 0:
                         tt = tiemposEjecucion[i] + tvc + numBloqueos[i]*duracionBloqueo
-                        proceso = Procesos(names[i], tt, tiemposEjecucion[i], 0, tvc, tb, ti, ti + tt)
+                        tcc = 0
+                        ti = 0
                     else:
-                        ti = self.microprocesadores[0].procesos[i-1].tf
                         tt = duracionCambio + tiemposEjecucion[i] + tvc + numBloqueos[i]*duracionBloqueo
-                        proceso = Procesos(names[i], tt, tiemposEjecucion[i], duracionCambio, tvc, tb, ti, ti + tt)
-
-                    
+                        ti = self.microprocesadores[0].procesos[i].tf
+                        tcc = duracionCambio
+                    proceso = Procesos(names[i], tt, tiemposEjecucion[i], tcc,tvc, tb, ti, ti + tt,0)
                     self.microprocesadores[0].procesos.append(proceso)
+                else:
+                    print("Holi")
+                    ti = self.microprocesadores[0].procesos[i].tf
+                    proceso = Procesos("Descanso", tEntrada[i] - ti,0,0,0,0,ti,tEntrada[i],0)
+                    self.microprocesadores[0].procesos.append(proceso)
+                    num = num +1
+                    self.des = True
+            else:
+                #En caso de que se requiera poner descansos
+
+                for k in range(len(self.microprocesadores)):
+                    lene = len(self.microprocesadores[k].procesos)
+                    if self.microprocesadores[k].procesos[lene-1].tf < tEntrada[i]:
+                        lene = len(self.microprocesadores[k].procesos)
+                        ti = self.microprocesadores[k].procesos[lene-1].tf
+                        proceso = Procesos("Descanso", tEntrada[i] - ti,0,0,0,0,ti,tEntrada[i],0)
+                        self.noMoreZeros = True
+                        self.microprocesadores[k].procesos.append(proceso)
+                        num = num +1
+
+                #Fin de poner descansos
+                self.noMoreZeros = True
+                for j in range(len(self.microprocesadores)):
+                    lene = len(self.microprocesadores[j].procesos)
+                    if self.microprocesadores[j].procesos[lene-1].tf == 0:
+                        self.noMoreZeros = False
+                        break
+
+                for k in range(len(self.microprocesadores)):
+                    #print("LENEEEEEEE")
+                    lene = len(self.microprocesadores[k].procesos)
+                    lene2 = len(self.microprocesadores[0].procesos)
+                    
+                    self.index = 0
+                    self.tiempoMenor = self.microprocesadores[0].procesos[lene2-1].tf
+                    #Obtener el menor tiempo de ejecucion
+                    if self.tiempoMenor> self.microprocesadores[k].procesos[lene-1].tf and self.microprocesadores[k].procesos[lene-1].tf >= tEntrada[i]:
+                        print("Tiempo ")
+                        print(self.tiempoMenor)
+                        print(self.microprocesadores[k].procesos[lene-1].tf)
+                        self.tiempoMenor = self.microprocesadores[k].procesos[lene-1].tf
+                        self.index = k
+                        if self.microprocesadores[k].procesos[lene-1].tf == 0:
+                            self.index = k
+                            break
+                        
+                        for j in range(k, len(self.microprocesadores)):
+                            lene = len(self.microprocesadores[j].procesos)
+                            if self.microprocesadores[j].procesos[lene-1].tf < self.tiempoMenor:
+                                self.tiempoMenor = self.microprocesadores[j].procesos[lene-1].tf
+                                self.index = j
+                        if self.noMoreZeros == True:
+                            break
+                
 
 
-    
-    
+                #Crear el proceso 
+                print("INDEXXXXXX")
+                print(self.tiempoMenor)
+                print(self.index)
+                lene = len(self.microprocesadores[self.index].procesos)
+                if len(self.microprocesadores[self.index].procesos) == 1 :
+                    tt = tiemposEjecucion[i] + tvc + numBloqueos[i]*duracionBloqueo
+                    tcc = 0
+                    ti = 0
+                elif self.microprocesadores[self.index].procesos[lene-1].name == "Descanso":
+                    tt = tiemposEjecucion[i] + tvc + numBloqueos[i]*duracionBloqueo
+                    ti = self.microprocesadores[self.index].procesos[lene-1].tf
+                    tcc = 0
+                else:
+                    tt = duracionCambio + tiemposEjecucion[i] + tvc + numBloqueos[i]*duracionBloqueo
+                    ti = self.microprocesadores[self.index].procesos[lene-1].tf
+                    tcc = duracionCambio
+                proceso = Procesos(names[i], tt, tiemposEjecucion[i], tcc,tvc, tb, ti, ti + tt,0)
+                self.microprocesadores[self.index].procesos.append(proceso)
+                    
+
+
     def imprimirEstado(self):
-        
         for i in range(len(self.microprocesadores)):
             print( "Microprocesador " + str(i+1))
             print( " Proceso " + " TCC    "+" TE    "+" TVC    "	+"  TB   "	+ "    TT   "	+"     TI   "+ 	"     TF   ")
             for j in range(len(self.microprocesadores[i].procesos)):
-                print("      " +self.microprocesadores[i].procesos[j].name + "      " +  str(self.microprocesadores[i].procesos[j].tcc) + "      " +str(self.microprocesadores[i].procesos[j].tiempoEjecucion) +"     " + str(self.microprocesadores[i].procesos[j].tvc) + "      " +str(self.microprocesadores[i].procesos[j].tb) +"     " + str(self.microprocesadores[i].procesos[j].tt) +"    " + str(self.microprocesadores[i].procesos[j].ti) +"   " + str(self.microprocesadores[i].procesos[j].tf))
+                if self.microprocesadores[i].procesos[j].tEspera > 0:
+                    aux = self.microprocesadores[i].procesos[j].tEspera
 
-
+                if self.microprocesadores[i].procesos[j].name != " ":
+                    print("      " +self.microprocesadores[i].procesos[j].name + "      " +  str(self.microprocesadores[i].procesos[j].tcc) + "      " +str(self.microprocesadores[i].procesos[j].tiempoEjecucion) +"     " + str(self.microprocesadores[i].procesos[j].tvc) + "      " +str(self.microprocesadores[i].procesos[j].tb) +"     " + str(self.microprocesadores[i].procesos[j].tt) +"    " + str(self.microprocesadores[i].procesos[j].ti) +"   " + str(self.microprocesadores[i].procesos[j].tf))
+                    
     def lecturaDeArchivo(self):
         archivo = open("proceso.txt", "r")
         if archivo.mode == 'r':
